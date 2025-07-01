@@ -8,6 +8,7 @@ from pcseg.utils import common_utils
 from .dataset import DatasetTemplate
 from .scannet.scannet_dataset import ScanNetDataset, ScanNetInstDataset
 from .s3dis.s3dis_dataset import S3DISDataset, S3DISInstDataset
+from .truckscenes.truckscenes_dataset import TruckScenesDataset
 
 
 __all__ = {
@@ -15,7 +16,10 @@ __all__ = {
     'ScanNetDataset': ScanNetDataset,
     'ScanNetInstDataset': ScanNetInstDataset,
     'S3DISDataset': S3DISDataset,
-    'S3DISInstDataset': S3DISInstDataset
+    'S3DISInstDataset': S3DISInstDataset,
+    
+    'TruckScenesDataset': TruckScenesDataset,
+    # 'TruckScenesInstDataset': TruckScenesInstDataset
 }
 
 
@@ -71,13 +75,19 @@ def build_dataloader(dataset_cfg, class_names, batch_size, dist, root_path=None,
     else:
         loader = DataLoader
 
+    # dataloader = loader(
+    #     dataset, batch_size=batch_size, pin_memory=True, num_workers=workers,
+    #     shuffle=(sampler is None) and training, drop_last=training, sampler=sampler,
+    #     collate_fn=getattr(dataset, dataset_cfg.COLLATE_FN),
+    #     timeout=0, worker_init_fn=partial(common_utils.worker_init_fn, seed=seed)
+    # )
+
     dataloader = loader(
         dataset, batch_size=batch_size, pin_memory=True, num_workers=workers,
-        shuffle=(sampler is None) and training, drop_last=training, sampler=sampler,
+        shuffle=(sampler is None) and training, drop_last=False, sampler=sampler,
         collate_fn=getattr(dataset, dataset_cfg.COLLATE_FN),
         timeout=0, worker_init_fn=partial(common_utils.worker_init_fn, seed=seed)
     )
-
     return dataset, dataloader, sampler
 
 

@@ -189,10 +189,12 @@ class IndoorDataset(DatasetTemplate):
         image_name_dict = {}
         image_corr_dict = {}
 
+        # SCENE
         if self.caption_cfg.get('SCENE', None) and self.caption_cfg.SCENE.ENABLED:
             image_name_dict['scene'] = None
             image_corr_dict['scene'] = None
 
+        # VIEW
         if hasattr(self, 'scene_image_corr_infos') and self.scene_image_corr_infos is not None:
             if isinstance(self.scene_image_corr_infos, dict):
                 # assert scene_name in self.scene_image_corr_infos
@@ -208,6 +210,7 @@ class IndoorDataset(DatasetTemplate):
             image_name_dict['view'] = image_name_view
             image_corr_dict['view'] = image_corr_view
 
+        # ENTITY
         if hasattr(self, 'scene_image_corr_entity_infos') and self.scene_image_corr_entity_infos is not None:
             if isinstance(self.scene_image_corr_entity_infos, dict):
                 # assert scene_name in self.scene_image_corr_entity_infos

@@ -1,0 +1,14 @@
+*.pickle
+.vscode
+*.npy
+*.pth
+*.pickle
+*.pkl
+output/
+
+__pycache__/
+**.pyc
+
+*.json
+*.zip
+*.pyc

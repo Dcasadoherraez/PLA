@@ -123,6 +123,10 @@ class TextSegHead(nn.Module):
     def get_loss(self):
         semantic_scores = self.forward_ret_dict['seg_scores']
         semantic_labels = self.forward_ret_dict['seg_labels']
+        pred = torch.argmax(semantic_scores, dim=1)
+        # print("Unique predicted labels:", torch.unique(pred))
+        # print("Unique ground truth labels:", torch.unique(semantic_labels))
+        
         seg_loss = self.seg_loss_func(semantic_scores, semantic_labels) * self.model_cfg.get('LOSS_WEIGHT', 1.0)
 
         tb_dict = {'loss_seg': seg_loss.item()}

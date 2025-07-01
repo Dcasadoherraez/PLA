@@ -18,10 +18,11 @@ class DataAugmentor(object):
                 continue
             cur_augmentor = partial(getattr(self, aug), config=self.aug_cfg[aug])
             self.data_augmentor_queue.append(cur_augmentor)
-
+            
     def __getstate__(self):
         d = dict(self.__dict__)
-        del d['logger']
+        # del d['logger']
+        d.pop('logger', None)
         return d
 
     def __setstate__(self, d):

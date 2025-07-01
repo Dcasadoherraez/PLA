@@ -54,6 +54,7 @@ class CaptionHead(nn.Module):
 
             # pooling object
             caption_embed = caption_infos[caption_type]['caption_embed']
+            # print(caption_type, caption_embed.shape)
             if caption_embed.shape[0] == 0:
                 caption_ret_dict[caption_type] = {'zero_loss': adapter_feats.sum() * 0.}
                 continue
@@ -126,6 +127,7 @@ class CaptionHead(nn.Module):
             offsets = batch_dict['offsets']
             origin_idx = batch_dict['origin_idx'][offsets[b]: offsets[b + 1]] if 'origin_idx' in batch_dict else None
             pc_count = batch_dict['pc_count'][b]
+            # print("PC COUNT", pc_count)
             batch_if_has_pts = torch.zeros(len(_frame_corr_idx), dtype=torch.bool).cuda()
             for i, idx in enumerate(_frame_corr_idx):
                 selected_mask = self.get_point_mask_for_point_img_points(pc_count, idx, origin_idx)
@@ -190,6 +192,7 @@ class CaptionHead(nn.Module):
 
         """
         selected_mask = torch.zeros(pc_count, dtype=torch.bool)
+        
         if idx is None:  # scene caption don't need to consider this part
             selected_mask[:] = True
         else:

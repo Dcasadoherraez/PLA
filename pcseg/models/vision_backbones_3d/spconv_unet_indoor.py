@@ -11,7 +11,6 @@ class SparseUNetIndoor(nn.Module):
     def __init__(self, model_cfg):
         super(SparseUNetIndoor, self).__init__()
         norm_fn = functools.partial(nn.BatchNorm1d, eps=1e-4, momentum=0.1)
-
         self.model_cfg = model_cfg
         self.in_channel = model_cfg.IN_CHANNEL
         self.mid_channel = model_cfg.MID_CHANNEL

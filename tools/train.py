@@ -22,6 +22,18 @@ from pcseg.utils import arnold_utils
 import warnings
 warnings.filterwarnings("ignore")
 
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+torch.manual_seed(0)
+
+# Clear existing data
+import uuid
+run_id = os.environ.get("CUDA_VISIBLE_DEVICES", str(uuid.uuid4()))
+for path in glob.glob(f"/dev/shm/{run_id}_truckscenes_*"):
+    print(f"Removing {path}")
+    os.remove(path)
+    
+
 def parse_config():
     parser = argparse.ArgumentParser(description='arg parser')
     parser.add_argument('--cfg_file', type=str, default=None, help='specify the config for training')
@@ -64,6 +76,7 @@ def parse_config():
     cfg_from_yaml_file(args.cfg_file, cfg)
     cfg.TAG = Path(args.cfg_file).stem
     cfg.EXP_GROUP_PATH = '/'.join(args.cfg_file.split('/')[1:-1])  # remove 'cfgs' and 'xxxx.yaml'
+    
 
     if args.set_cfgs is not None:
         cfg_from_list(args.set_cfgs, cfg)
@@ -102,7 +115,8 @@ def main():
     if args.fix_random_seed:
         common_utils.set_random_seed(666 + cfg.LOCAL_RANK)
 
-    output_dir = cfg.ROOT_DIR / 'output' / cfg.EXP_GROUP_PATH / cfg.TAG / args.extra_tag
+    # output_dir = cfg.ROOT_DIR / 'output' / cfg.EXP_GROUP_PATH / cfg.TAG / args.extra_tag
+    output_dir = Path(f"/home/daniel/spatial_understanding/benchmarks/PLA/output/{cfg.TAG}/{args.extra_tag}")
     ckpt_dir = output_dir / 'ckpt'
     output_dir.mkdir(parents=True, exist_ok=True)
     ckpt_dir.mkdir(parents=True, exist_ok=True)

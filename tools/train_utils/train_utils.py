@@ -10,6 +10,9 @@ from pcseg.models import load_data_to_gpu
 from tools.eval_utils import eval_utils
 from .optimization import adjust_lr
 
+import matplotlib.pyplot as plt
+import numpy as np
+import pickle
 
 def train_one_epoch(args, model, optimizer, train_loader, lr_scheduler, accumulated_iter, rank,
                     total_it_each_epoch, dataloader_iter, cur_epoch, tb_log=None, logger=None,
@@ -67,7 +70,7 @@ def train_one_epoch(args, model, optimizer, train_loader, lr_scheduler, accumula
         optimizer.zero_grad()
 
         load_data_to_gpu(batch)
-
+        
         #######################################################
         # forward text encoder to extract captions embeddings #
         #######################################################
@@ -98,7 +101,49 @@ def train_one_epoch(args, model, optimizer, train_loader, lr_scheduler, accumula
             raise ValueError("The model parameters contain NaN.")
 
         accumulated_iter += 1
+        
+        model.eval()
+        with torch.no_grad():
+            ret_dict = model(batch)
+        # print( "ret_dict after nograd--> ", batch['voxel_features'].shape)
+        
+        # with torch.no_grad():
+        #     print('ret_dict1')
+        #     print( "ret_dict1--> ", batch['voxel_features'].shape)
 
+        #     ret_dict1 = model(batch)
+
+        # model.eval()
+        # with torch.no_grad():
+        #     print('ret_dict2')
+        #     print( "ret_dict2--> ", batch['voxel_features'].shape)
+
+        #     ret_dict2 = model(batch)
+        # np.savetxt("/home/daniel/spatial_understanding/benchmarks/PLA/deleteme/train1.txt", ret_dict1['seg_preds'].cpu().numpy())
+        # np.savetxt("/home/daniel/spatial_understanding/benchmarks/PLA/deleteme/train2.txt", ret_dict2['seg_preds'].cpu().numpy())
+
+        # # print("Train state")
+        # # print({k: v.clone().cpu() for k, v in model.state_dict().items()})
+        # with open("/home/daniel/spatial_understanding/benchmarks/PLA/deleteme/train_batch.pkl", "wb") as f:
+        #     pickle.dump(batch, f)
+
+        # # print("LA KEEEEEY", batch.keys())
+        # # suu = batch['points_xyz'].cpu().numpy()
+        # # plt.scatter(suu[:, 0], suu[:, 1])
+        # # plt.gca().set_aspect('equal')
+        # # plt.savefig("/home/daniel/spatial_understanding/benchmarks/PLA/deleteme/train.png")
+        # print("savin train")
+        # torch.save(model.state_dict(), "/home/daniel/spatial_understanding/benchmarks/PLA/deleteme/train_state.pth")
+        # np.savetxt("/home/daniel/spatial_understanding/benchmarks/PLA/deleteme/train_xyz.txt", batch['points_xyz'].cpu().numpy())
+        # np.savetxt("/home/daniel/spatial_understanding/benchmarks/PLA/deleteme/train.txt", ret_dict['seg_preds'].cpu().numpy())
+        # np.savetxt("/home/daniel/spatial_understanding/benchmarks/PLA/deleteme/train_labels.txt", ret_dict['seg_labels'].cpu().numpy())
+        # Save XYZ and labels in image to visualize in 2D
+        # plt.figure(figsize=(15, 15))
+        # plt.scatter(batch['points_xyz'][:, 0].cpu().numpy(), batch['points_xyz'][:, 1].cpu().numpy(), c=ret_dict['seg_labels'].cpu().numpy(), s=1)
+        # plt.colorbar()
+        # plt.gca().set_aspect('equal')
+        # plt.savefig(f"/home/daniel/spatial_understanding/benchmarks/PLA/.vscode/deleteme/train_labels_{accumulated_iter}.png")
+        
         # record evaluation metrics for segmentation
         intersection_meter, union_meter, target_meter, output_meter, accuracy = common_utils.update_meter(
             intersection_meter, union_meter, target_meter, output_meter, ret_dict['seg_preds'],

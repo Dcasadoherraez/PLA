@@ -76,7 +76,9 @@ class DatasetTemplate(torch_data.Dataset):
 
     def __getstate__(self):
         d = dict(self.__dict__)
-        del d['logger']
+        # del d['logger']
+        d.pop('logger', None)
+
         return d
 
     def __setstate__(self, d):
@@ -186,11 +188,17 @@ class DatasetTemplate(torch_data.Dataset):
             else:
                 ret[key] = np.stack(val, axis=0)
 
+        if 'points_xyz_voxel_scale' not in ret:
+            ret['points_xyz_voxel_scale'] = np.concatenate([np.concatenate([np.full((d.shape[0], 1), i), d.astype(np.int64)], axis=-1)
+                for i, d in enumerate(data_dict['points_xyz'].copy())], axis=0)
+
         ret['spatial_shape'] = np.clip(
             (ret['points_xyz_voxel_scale'].max(0)[1:] + 1), self.dataset_cfg.MIN_SPATIAL_SCALE, None
         )
+        
 
         ret['batch_idxs'] = ret['points_xyz_voxel_scale'][:, 0].astype(np.int32)
+        
         if len(batch_list) == 1:
             ret['offsets'] = np.array([0, ret['batch_idxs'].shape[0]]).astype(np.int32)
         else:
@@ -232,6 +240,8 @@ class DatasetTemplate(torch_data.Dataset):
             else:
                 select_captions, select_image_corr = [], []
         else:
+            # print(image_names)
+            # print(caption[scene_name])
             assert len(image_names) == 0 or len(caption[scene_name]) == len(image_names)
             select_image_names, select_image_corr = DatasetTemplate.select_images(
                 caption_cfg, image_names, image_corr_indices

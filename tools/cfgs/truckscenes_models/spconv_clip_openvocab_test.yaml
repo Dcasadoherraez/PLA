@@ -1,0 +1,22 @@
+_BASE_CONFIG_: cfgs/truckscenes_models/spconv_clip_adamw.yaml
+
+DATA_CONFIG:
+  # TODO: split the input categories into base/novel/ignore.
+  # Note that if you has gropud-truth annotations for the test samples,
+  # you need to carefully set thoese parameters to evaluate the performance quantitatively.
+  # If you just want to evaluate it qualitiatively, you can just put all the categories into base_class_idx.
+  # base_class_idx: [ 0, 1, 2, 3, 4]
+  # novel_class_idx: []
+  # ignore_class_idx: [ ]
+  base_class_idx: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ]
+  novel_class_idx: [ 12 ]
+  ignore_class_idx: [ 12 ]
+
+MODEL:
+  TASK_HEAD:
+    CORRECT_SEG_PRED_BINARY: True  # TODO: For out-of-domain data, set this to False probably leads to better performance
+
+TEXT_ENCODER:
+  EXTRACT_EMBED: True
+  CATEGORY_NAMES: ['animal', 'barrier', 'bicycle', 'bus', 'car', 'motorcycle', 'construction vehicle', 'person', 'traffic cone',
+                'traffic sign', 'trailer', 'truck', other]

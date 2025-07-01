@@ -9,6 +9,8 @@ from .inst_eval.eval_utils import ScanNetEval
 from .inst_eval.pointwise_eval_utils import evaluate_semantic_miou, evaluate_semantic_acc, evaluate_offset_mae
 from .save_utils import save_npy, save_pred_instances
 
+import matplotlib.pyplot as plt
+import pickle
 
 def eval_one_epoch(cfg, args, model, dataloader, epoch_id, logger, dist_test=False, writer=None,
                    best_metric=0.0, best_epoch=-1, task='sem', eval_output_dir=None):
@@ -40,6 +42,9 @@ def eval_sem(cfg, args, model, dataloader, epoch_id, logger, dist_test=False, wr
 
     logger.info('*************** EPOCH %s EVALUATION *****************' % epoch_id)
     model.eval()
+    
+    # print("Val state")
+    # print({k: v.clone().cpu() for k, v in model.state_dict().items()})
 
     if cfg.LOCAL_RANK == 0:
         progress_bar = tqdm.tqdm(total=len(dataloader), leave=True, desc='eval', dynamic_ncols=True)
@@ -50,9 +55,34 @@ def eval_sem(cfg, args, model, dataloader, epoch_id, logger, dist_test=False, wr
         batch_dict['epoch'] = epoch_id - 1
         with torch.no_grad():
             ret_dict = model(batch_dict)
+
         preds, labels = ret_dict['seg_preds'], ret_dict['seg_labels']
         disp_dict = {}
 
+
+        # print("LA KEEEEEY", batch.keys())
+        # suu = batch['points_xyz'].cpu().numpy()
+        # plt.scatter(suu[:, 0], suu[:, 1])
+        # plt.gca().set_aspect('equal')
+        # plt.savefig("/home/daniel/spatial_understanding/benchmarks/PLA/deleteme/train.png")
+        # print("savin eval")
+        # print( "eval--> ", batch_dict['voxel_features'].shape)
+
+        # with torch.no_grad():
+        #     ret_dict1 = model(batch_dict)
+        #     ret_dict2 = model(batch_dict)
+        # np.savetxt("/home/daniel/spatial_understanding/benchmarks/PLA/deleteme/val1.txt", ret_dict1['seg_preds'].cpu().numpy())
+        # np.savetxt("/home/daniel/spatial_understanding/benchmarks/PLA/deleteme/val2.txt", ret_dict2['seg_preds'].cpu().numpy())
+
+        # with open("/home/daniel/spatial_understanding/benchmarks/PLA/deleteme/eval_batch.pkl", "wb") as f:
+        #     pickle.dump(batch_dict, f)
+
+        # torch.save(model.state_dict(), "/home/daniel/spatial_understanding/benchmarks/PLA/deleteme/eval_state.pth")
+        # np.savetxt("/home/daniel/spatial_understanding/benchmarks/PLA/deleteme/val_xyz.txt", batch_dict['points_xyz'].cpu().numpy())
+        # np.savetxt("/home/daniel/spatial_understanding/benchmarks/PLA/deleteme/val.txt", ret_dict['seg_preds'].cpu().numpy())
+        # np.savetxt("/home/daniel/spatial_understanding/benchmarks/PLA/deleteme/val_labels.txt", ret_dict['seg_labels'].cpu().numpy())
+        
+        
         cur_sample_id = (i * args.test_batch_size + (
             len(batch_dict['ids']) - 1)) * world_size + cfg.LOCAL_RANK + 1
         if dist_test and cur_sample_id > len(dataset):
@@ -65,7 +95,7 @@ def eval_sem(cfg, args, model, dataloader, epoch_id, logger, dist_test=False, wr
         # calculate metric
         intersection_meter, union_meter, target_meter, output_meter, _ = common_utils.update_meter(
             intersection_meter, union_meter, target_meter, output_meter, preds, labels,
-            num_class, ignore_label=cfg.DATA_CONFIG.get('IGNORE_LABEL', 255)
+            num_class, ignore_label=cfg.DATA_CONFIG.get('IGNORE_LABEL', -100)
         )
         if cfg.MODEL.get('BINARY_HEAD', False):
             binary_preds = ret_dict['binary_preds']
@@ -145,12 +175,16 @@ def eval_sem(cfg, args, model, dataloader, epoch_id, logger, dist_test=False, wr
             writer.add_scalar('IoU_novel_val', iou_novel, epoch_id + 1)
     torch.cuda.empty_cache()
     logger.info('****************Evaluation done.*****************')
+
     if best_metric is not None:
         if metric > best_metric:
             best_metric = metric
             best_epoch = epoch_id
 
         logger.info('Best epoch: {}, best metric: {}'.format(best_epoch, best_metric))
+    
+    
+    # exit(-1)
     return best_metric, best_epoch
 
 
