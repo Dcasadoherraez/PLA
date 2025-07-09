@@ -1,0 +1,7 @@
+# ninja log v6
+0	11448	1749755365233966268	/home/daniel/spatial_understanding/benchmarks/PLA/pcseg/external_libs/softgroup_ops/build/temp.linux-x86_64-cpython-38/ops/src/cuda.o	8f94cd4ec3a5aac1
+2	12586	1749755365233966268	/home/daniel/spatial_understanding/benchmarks/PLA/pcseg/external_libs/softgroup_ops/build/temp.linux-x86_64-cpython-38/ops/src/softgroup_ops.o	bdc38a481489984b
+1	15022	1749755365233966268	/home/daniel/spatial_understanding/benchmarks/PLA/pcseg/external_libs/softgroup_ops/build/temp.linux-x86_64-cpython-38/ops/src/softgroup_api.o	ac4beb4a82020205
+5	11412	1749755381125810319	/home/daniel/spatial_understanding/benchmarks/PLA/pcseg/external_libs/softgroup_ops/build/temp.linux-x86_64-cpython-38/ops/src/cuda.o	89b2affd02a1e573
+7	12410	1749755381129810280	/home/daniel/spatial_understanding/benchmarks/PLA/pcseg/external_libs/softgroup_ops/build/temp.linux-x86_64-cpython-38/ops/src/softgroup_ops.o	fe33fc89c67f09e7
+6	14957	1749755381129810280	/home/daniel/spatial_understanding/benchmarks/PLA/pcseg/external_libs/softgroup_ops/build/temp.linux-x86_64-cpython-38/ops/src/softgroup_api.o	67f7010a16c0975b

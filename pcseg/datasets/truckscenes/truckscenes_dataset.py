@@ -208,7 +208,6 @@ class TruckScenesDataset(IndoorDataset):
         scene_name = self.data_list[index]
         scene_map_path = self.all_data_list[index]
         shm_key = f"{self.run_id}_truckscenes_{scene_name}"
-        
         if self.cache:
             xyz = SA.attach(f"shm://{shm_key}_xyz").copy()
             feats = SA.attach(f"shm://{shm_key}_feats").copy()
@@ -261,6 +260,7 @@ class TruckScenesDataset(IndoorDataset):
         # print("AAAAAAAAAAAAAAAAA", fn)
         # print(np.unique(label))
         # exit(-1)
+        
         return xyz_transformed, feats, label, inst_label, binary_label
 
 
@@ -277,6 +277,7 @@ class TruckScenesDataset(IndoorDataset):
         Returns:
             data_dict: Dictionary containing points, features, labels, and optional image correspondences.
         """
+        
         index = item % len(self.data_list)
         xyz, feats, label, inst_label, binary_label = self.load_data(index)
 
@@ -297,7 +298,7 @@ class TruckScenesDataset(IndoorDataset):
         if self.training and hasattr(self, 'caption_cfg'): # and self.caption_cfg.get('CAPTION_CORR_PATH_IN_ONE_FILE', True):
             image_corr_dict, image_name_dict = self.get_caption_image_corr_and_name_from_memory(scene_name, index)
             caption_data = self.select_caption_and_idx_all(scene_name, image_name_dict, image_corr_dict)
-            
+        
         data_dict = {
             'points_xyz': xyz,
             'rgb': rgb,

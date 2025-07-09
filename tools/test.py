@@ -18,6 +18,13 @@ from pcseg.models import build_vision_network, build_text_network
 from pcseg.models.text_networks import load_text_embedding_from_encoder, load_text_embedding_from_path
 from pcseg.utils import common_utils
 
+# Clear existing data
+import uuid
+run_id = os.environ.get("CUDA_VISIBLE_DEVICES", str(uuid.uuid4()))
+for path in glob.glob(f"/dev/shm/{run_id}_truckscenes_*"):
+    print(f"Removing {path}")
+    os.remove(path)
+    
 
 def parse_config():
     parser = argparse.ArgumentParser(description='arg parser')

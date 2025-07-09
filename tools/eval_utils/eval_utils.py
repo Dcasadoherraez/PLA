@@ -49,6 +49,9 @@ def eval_sem(cfg, args, model, dataloader, epoch_id, logger, dist_test=False, wr
     if cfg.LOCAL_RANK == 0:
         progress_bar = tqdm.tqdm(total=len(dataloader), leave=True, desc='eval', dynamic_ncols=True)
 
+    all_preds = []
+    all_labels = []
+
     for i, batch_dict in enumerate(dataloader):
         load_data_to_gpu(batch_dict)
 
@@ -58,6 +61,8 @@ def eval_sem(cfg, args, model, dataloader, epoch_id, logger, dist_test=False, wr
 
         preds, labels = ret_dict['seg_preds'], ret_dict['seg_labels']
         disp_dict = {}
+        all_preds.append(preds.cpu().numpy())
+        all_labels.append(labels.cpu().numpy())
 
 
         # print("LA KEEEEEY", batch.keys())
@@ -123,6 +128,16 @@ def eval_sem(cfg, args, model, dataloader, epoch_id, logger, dist_test=False, wr
         if cfg.LOCAL_RANK == 0:
             progress_bar.set_postfix(disp_dict)
             progress_bar.update()
+
+
+    all_preds = np.concatenate(all_preds)
+    all_labels = np.concatenate(all_labels)
+
+    # Save the results for evaluation with other methods
+    results_save_path = f"/home/daniel/spatial_understanding/benchmarks/inference/pla/scene_view_caption_baseNone_val.npz"
+    np.savez_compressed(results_save_path, preds=all_preds, gts=all_labels)
+
+
 
     if cfg.LOCAL_RANK == 0:
         progress_bar.close()

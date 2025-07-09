@@ -1,0 +1,14 @@
+Metadata-Version: 2.1
+Name: pcseg
+Version: 0.1.0+3a7103a
+Summary: PCSeg
+Author: Jihan Yang
+Author-email: jihanyang13@gmail.com
+License: Apache License 2.0
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: tensorboardX
+Requires-Dist: easydict
+Requires-Dist: pyyaml
+Requires-Dist: tqdm
+Requires-Dist: SharedArray
